@@ -34,7 +34,7 @@ export async function getPost(id:string) {
 export async function searchPosts(search:string) {
     const decodedSearch = decodeURIComponent(search)
     const normalizedSearch = decodedSearch.replace(/[!@#$%^&*()_+\-=\[\]{};':"\\|,.\/?]/g,"").trim()
-    const searchWords = normalizedSearch.split("").filter(Boolean)
+    const searchWords = normalizedSearch.split(" ").filter(Boolean)
 
     const filters = searchWords.map(word => ({
         OR:[
