@@ -1,6 +1,6 @@
 "use server"
 
-import saveImage from '@/utils/image';
+import { saveImage } from '@/utils/image';
 import postSchema from '@/validations/posts';
 import { prisma } from '../prisma';
 import { redirect } from 'next/navigation';
