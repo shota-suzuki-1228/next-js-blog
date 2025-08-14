@@ -1,10 +1,11 @@
-import { getPost } from "@/lib/post"
-import NotFound from "./not-found"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Image from "next/image"
 import { format } from "date-fns"
 import { ja } from "date-fns/locale"
-import ReactMarkDown from "react-markdown"
+import NotFound from "@/app/(public)/posts/[id]/not-found"
+import GetOwnPost from "@/lib/ownpost"
+import { auth } from "@/auth"
+import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm"
 import rehypeHighlight from "rehype-highlight"
 
@@ -12,9 +13,15 @@ type Params = {
     params:Promise<{id:string}>
 }
 
-const PostPage = async ({params}: Params) => {
+const ShowPage = async ({params}: Params) => {
+  const session = await auth()
+  const userId = session?.user?.id
+  if(!session?.user?.email || !userId){
+    throw new Error("不正なリクエストです")
+  }
+
   const {id} = await params
-  const post = await getPost(id)
+  const post = await GetOwnPost(userId,id)
 
   if(!post){
     return <NotFound /> 
@@ -47,15 +54,15 @@ const PostPage = async ({params}: Params) => {
                 <CardTitle className="text-3xl font-bold">{post.title}</CardTitle>
             </CardHeader>
             <CardContent className="p-6 pt-0">
-                <div className="prose max-w-none">
-                    <ReactMarkDown
+                <div className="border p-4 bg-gray-50 prose max-w-none">
+                    <ReactMarkdown
                         remarkPlugins={[remarkGfm]}
                         rehypePlugins={[rehypeHighlight]}
                         skipHtml={false} 
                         unwrapDisallowed={true} 
-                        >
+                    >
                         {post.content}
-                    </ReactMarkDown>
+                    </ReactMarkdown>
                 </div>
             </CardContent>
         </Card>
@@ -63,4 +70,4 @@ const PostPage = async ({params}: Params) => {
   )
 }
 
-export default PostPage
+export default ShowPage
